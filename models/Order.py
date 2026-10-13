@@ -1,6 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
+from sqlalchemy import DateTime
 from sqlmodel import Field, SQLModel
 
 
@@ -27,3 +28,13 @@ class Order(SQLModel, table=True):
     fecha_ultima_actualizacion: datetime = Field(
         default_factory=datetime.utcnow
     )
+
+    fecha_creacion: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_type=DateTime(timezone=True),
+    )
+    fecha_ultima_actualizacion: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_type=DateTime(timezone=True),
+    )
+    

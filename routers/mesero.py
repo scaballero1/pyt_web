@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session, select
@@ -20,7 +20,7 @@ def get_order_or_404(session: Session, order_id: int) -> Order:
 
 
 def touch(order: Order):
-    order.fecha_ultima_actualizacion = datetime.utcnow()
+    order.fecha_ultima_actualizacion = datetime.now(timezone.utc)
 
 
 # ---------- Consulta (menú y mesas) ----------
