@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
@@ -28,7 +28,7 @@ def update_order_status(order_id: int, estado: EstadoPedido, session: Session = 
     if not order:
         raise HTTPException(status_code=404, detail="Pedido no encontrado")
     order.estado = estado
-    order.fecha_ultima_actualizacion = datetime.utcnow()
+    order.fecha_ultima_actualizacion = datetime.now(timezone.utc)
     session.add(order)
     session.commit()
     session.refresh(order)
