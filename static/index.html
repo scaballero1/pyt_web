@@ -71,6 +71,67 @@
             </div>
         </div>
 
+        <!-- SECCIÓN ADMINISTRADOR: GESTIÓN DE USUARIOS (HU-01) -->
+        <div class="row mb-4">
+            <!-- Formulario Crear / Editar Usuario -->
+            <div class="col-md-4 mb-3">
+                <div class="card shadow-sm border-0">
+                    <div id="usuario-titulo" class="card-header bg-dark text-white fw-bold">
+                        👥 Agregar Usuario
+                    </div>
+                    <div class="card-body">
+                        <form id="form-usuario" onsubmit="guardarUsuario(event)">
+                            <input type="hidden" id="usuario-id">
+                            <div class="mb-2">
+                                <label class="form-label small mb-1">Nombre</label>
+                                <input type="text" id="usuario-nombre" class="form-control" placeholder="Ej: Ana Gómez" required>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small mb-1">Correo</label>
+                                <input type="email" id="usuario-correo" class="form-control" placeholder="Ej: ana@restaurante.com" required>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small mb-1">Contraseña</label>
+                                <input type="password" id="usuario-contrasena" class="form-control" placeholder="Contraseña" autocomplete="new-password" required>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small mb-1">Rol</label>
+                                <select id="usuario-rol" class="form-select" required>
+                                    <option value="mesero">Mesero</option>
+                                    <option value="cocina">Cocina</option>
+                                    <option value="admin">Administrador</option>
+                                </select>
+                            </div>
+                            <button type="submit" id="usuario-guardar" class="btn btn-primary btn-sm w-100 mt-2">Guardar Usuario</button>
+                            <button type="button" id="usuario-cancelar" class="btn btn-outline-secondary btn-sm w-100 mt-2 d-none" onclick="cancelarEdicionUsuario()">Cancelar edición</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Usuarios -->
+            <div class="col-md-8 mb-3">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fs-6">Usuarios del Restaurante</h5>
+                        <button onclick="cargarUsuarios()" class="btn btn-sm btn-light">Actualizar</button>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr><th>ID</th><th>Nombre</th><th>Correo</th><th>Rol</th><th class="text-end">Acciones</th></tr>
+                                </thead>
+                                <tbody id="tabla-usuarios">
+                                    <tr><td colspan="5" class="text-muted text-center py-3">Cargando...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <hr class="my-4">
 
         <!-- SECCIÓN MESERO: CONSULTA DE DATOS -->

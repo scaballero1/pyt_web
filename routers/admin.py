@@ -1,5 +1,3 @@
-import hashlib
-import os
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -8,9 +6,12 @@ from sqlmodel import Session, SQLModel, select
 
 from DataBase import get_session
 from models.Inventory import Inventory
+from models.Order import Order
+from models.Order_Detail import OrderDetail
 from models.Product_Category import Product, ProductCategory
 from models.Table import Table
 from models.User import RolUsuario, User
+from security import hash_password
 
 router = APIRouter(prefix="/admin", tags=["Administrador"])
 
@@ -21,12 +22,6 @@ def get_or_404(session: Session, model, obj_id: int, nombre: str):
     if not obj:
         raise HTTPException(status_code=404, detail=f"{nombre} no encontrado")
     return obj
-
-
-def hash_password(password: str) -> str:
-    salt = os.urandom(16)
-    h = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, 100_000)
-    return salt.hex() + ":" + h.hex()
 
 
 def replace_fields(obj, body):
@@ -100,7 +95,10 @@ def update_user(user_id: int, data: UserUpdate, session: Session = Depends(get_s
 
 @router.delete("/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(user_id: int, session: Session = Depends(get_session)):
-    session.delete(get_or_404(session, User, user_id, "Usuario"))
+    user = get_or_404(session, User, user_id, "Usuario")
+    if session.exec(select(Order).where(Order.mesero_id == user_id)).first():
+        raise HTTPException(status_code=409, detail="El usuario tiene pedidos asociados")
+    session.delete(user)
     session.commit()
 
 
@@ -135,7 +133,10 @@ def update_table(table_id: int, body: Table, session: Session = Depends(get_sess
 
 @router.delete("/tables/{table_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_table(table_id: int, session: Session = Depends(get_session)):
-    session.delete(get_or_404(session, Table, table_id, "Mesa"))
+    table = get_or_404(session, Table, table_id, "Mesa")
+    if session.exec(select(Order).where(Order.mesa_id == table_id)).first():
+        raise HTTPException(status_code=409, detail="La mesa tiene pedidos asociados")
+    session.delete(table)
     session.commit()
 
 
@@ -212,7 +213,10 @@ def update_product(product_id: int, body: Product, session: Session = Depends(ge
 
 @router.delete("/products/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_product(product_id: int, session: Session = Depends(get_session)):
-    session.delete(get_or_404(session, Product, product_id, "Producto"))
+    product = get_or_404(session, Product, product_id, "Producto")
+    if session.exec(select(OrderDetail).where(OrderDetail.product_id == product_id)).first():
+        raise HTTPException(status_code=409, detail="El producto está en pedidos existentes")
+    session.delete(product)
     session.commit()
 
 

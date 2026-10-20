@@ -513,264 +513,344 @@
             }
           },
           "response": []
+        }
+      ]
+    },
+    {
+      "name": "Pedidos (mesero)",
+      "item": [
+        {
+          "name": "Crear pedido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/mesero/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "mesero",
+                "orders"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mesa_id\": 1,\n  \"mesero_id\": 1,\n  \"tipo_pedido\": \"salon\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
         },
         {
-          "name": "Pedidos (mesero)",
-          "item": [
-            {
-              "name": "Crear pedido",
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "url": {
-                  "raw": "{{base_url}}/mesero/orders",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "mesero",
-                    "orders"
-                  ]
-                },
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"mesa_id\": 1,\n  \"mesero_id\": 1,\n  \"tipo_pedido\": \"salon\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Listar pedidos",
-              "request": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "url": {
-                  "raw": "{{base_url}}/mesero/orders",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "mesero",
-                    "orders"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Obtener pedido",
-              "request": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "url": {
-                  "raw": "{{base_url}}/mesero/orders/1",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "mesero",
-                    "orders",
-                    "1"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Actualizar pedido",
-              "request": {
-                "method": "PUT",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "url": {
-                  "raw": "{{base_url}}/mesero/orders/1",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "mesero",
-                    "orders",
-                    "1"
-                  ]
-                },
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"mesa_id\": 1,\n  \"mesero_id\": 1,\n  \"tipo_pedido\": \"para_llevar\",\n  \"estado\": \"PENDIENTE\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Eliminar pedido",
-              "request": {
-                "method": "DELETE",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "url": {
-                  "raw": "{{base_url}}/mesero/orders/1",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "mesero",
-                    "orders",
-                    "1"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Agregar ítem",
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "url": {
-                  "raw": "{{base_url}}/mesero/orders/1/items",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "mesero",
-                    "orders",
-                    "1",
-                    "items"
-                  ]
-                },
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"order_id\": 1,\n  \"product_id\": 1,\n  \"cantidad\": 2,\n  \"precio_unitario\": 0\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Listar ítems",
-              "request": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "url": {
-                  "raw": "{{base_url}}/mesero/orders/1/items",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "mesero",
-                    "orders",
-                    "1",
-                    "items"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Actualizar ítem (cantidad)",
-              "request": {
-                "method": "PUT",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "url": {
-                  "raw": "{{base_url}}/mesero/orders/1/items/1?cantidad=3",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "mesero",
-                    "orders",
-                    "1",
-                    "items",
-                    "1"
-                  ],
-                  "query": [
-                    {
-                      "key": "cantidad",
-                      "value": "3"
-                    }
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Eliminar ítem",
-              "request": {
-                "method": "DELETE",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "url": {
-                  "raw": "{{base_url}}/mesero/orders/1/items/1",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "mesero",
-                    "orders",
-                    "1",
-                    "items",
-                    "1"
-                  ]
-                }
-              },
-              "response": []
+          "name": "Listar pedidos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/mesero/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "mesero",
+                "orders"
+              ]
             }
-          ]
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener pedido",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/mesero/orders/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "mesero",
+                "orders",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar pedido",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/mesero/orders/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "mesero",
+                "orders",
+                "1"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"EN PREPARACIÓN\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar pedido",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/mesero/orders/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "mesero",
+                "orders",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Agregar ítem",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/mesero/orders/1/items",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "mesero",
+                "orders",
+                "1",
+                "items"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": 1,\n  \"cantidad\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar ítems",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/mesero/orders/1/items",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "mesero",
+                "orders",
+                "1",
+                "items"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener ítem",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/mesero/orders/1/items/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "mesero",
+                "orders",
+                "1",
+                "items",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar ítem (cantidad)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/mesero/orders/1/items/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "mesero",
+                "orders",
+                "1",
+                "items",
+                "1"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cantidad\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar ítem",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/mesero/orders/1/items/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "mesero",
+                "orders",
+                "1",
+                "items",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Consultas (mesero)",
+      "item": [
+        {
+          "name": "Consultar menú",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/mesero/menu",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "mesero",
+                "menu"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Consultar mesas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/mesero/tables",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "mesero",
+                "tables"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },

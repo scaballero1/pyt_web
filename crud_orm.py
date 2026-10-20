@@ -1,14 +1,17 @@
 """
 CRUD con acceso a través de ORM (SQLModel / SQLAlchemy).
-Entidades: Mesas y Productos. Usa los mismos modelos de la carpeta models/.
+Entidades: Mesas, Productos y Usuarios. Usa los mismos modelos de la carpeta models/.
 Ejecutar desde la raíz del proyecto:  py crud_orm.py
 """
 from sqlalchemy import text
 from sqlmodel import Session, select
 
 from DataBase import create_db_and_tables, engine
+from models.Order import Order
 from models.Product_Category import Product, ProductCategory
 from models.Table import Table
+from models.User import RolUsuario, User
+from security import hash_password
 
 
 # ======================= MESAS =======================
@@ -110,12 +113,93 @@ def eliminar_producto(prod_id):
         return True
 
 
+# ======================= USUARIOS =======================
+def validar_rol(texto):
+    try:
+        return RolUsuario(texto.strip().lower())
+    except ValueError:
+        raise ValueError("Rol inválido: use mesero, cocina o admin")
+
+
+def usuario_a_dict(u):
+    """Nunca se muestra el hash de la contraseña."""
+    return {"id": u.id, "nombre": u.nombre, "correo": u.correo, "rol": u.rol.value}
+
+
+def crear_usuario(nombre, correo, contrasena, rol):
+    if not contrasena:
+        raise ValueError("La contraseña es obligatoria")
+    rol = validar_rol(rol)
+    with Session(engine) as session:
+        if session.exec(select(User).where(User.correo == correo)).first():
+            raise ValueError("El correo ya está registrado")
+        user = User(nombre=nombre, correo=correo, rol=rol,
+                    contrasena_hash=hash_password(contrasena))
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+        return usuario_a_dict(user)
+
+
+def listar_usuarios():
+    with Session(engine) as session:
+        return [usuario_a_dict(u) for u in session.exec(select(User).order_by(User.id)).all()]
+
+
+def obtener_usuario(user_id):
+    with Session(engine) as session:
+        u = session.get(User, user_id)
+        return usuario_a_dict(u) if u else None
+
+
+def actualizar_usuario(user_id, nombre=None, correo=None, contrasena=None, rol=None):
+    """Solo cambia los campos que se envían (los None se dejan igual)."""
+    with Session(engine) as session:
+        user = session.get(User, user_id)
+        if not user:
+            return None
+        if correo:
+            otro = session.exec(select(User).where(User.correo == correo)).first()
+            if otro and otro.id != user_id:
+                raise ValueError("El correo ya está registrado")
+            user.correo = correo
+        if nombre:
+            user.nombre = nombre
+        if contrasena:
+            user.contrasena_hash = hash_password(contrasena)
+        if rol:
+            user.rol = validar_rol(rol)
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+        return usuario_a_dict(user)
+
+
+def eliminar_usuario(user_id):
+    with Session(engine) as session:
+        user = session.get(User, user_id)
+        if not user:
+            return False
+        if session.exec(select(Order).where(Order.mesero_id == user_id)).first():
+            raise ValueError("El usuario tiene pedidos asociados; no se puede eliminar")
+        session.delete(user)
+        session.commit()
+        return True
+
+
 # ======================= MENÚ DE CONSOLA =======================
 def mostrar(objs):
     if not objs:
         print("  (sin registros)")
     for o in objs if isinstance(objs, list) else [objs]:
         print("  ", o.model_dump())
+
+
+def mostrar_usuarios(u):
+    if not u:
+        print("  (sin registros)")
+    for x in u if isinstance(u, list) else [u]:
+        print("  ", x)
 
 
 def menu_mesas():
@@ -170,14 +254,46 @@ def menu_productos():
             print("Error:", e)
 
 
+def menu_usuarios():
+    while True:
+        print("\n--- USUARIOS ---\n1 Crear  2 Listar  3 Buscar por id  4 Actualizar  5 Eliminar  0 Volver")
+        op = input("Opción: ").strip()
+        try:
+            if op == "1":
+                u = crear_usuario(input("Nombre: ").strip(), input("Correo: ").strip(),
+                                  input("Contraseña: "), input("Rol (mesero/cocina/admin): "))
+                print("Creado:", u)
+            elif op == "2":
+                mostrar_usuarios(listar_usuarios())
+            elif op == "3":
+                u = obtener_usuario(int(input("Id: ")))
+                mostrar_usuarios(u) if u else print("No existe")
+            elif op == "4":
+                print("(Deja vacío lo que no quieras cambiar)")
+                u = actualizar_usuario(int(input("Id: ")),
+                                       input("Nuevo nombre: ").strip() or None,
+                                       input("Nuevo correo: ").strip() or None,
+                                       input("Nueva contraseña: ") or None,
+                                       input("Nuevo rol (mesero/cocina/admin): ").strip() or None)
+                mostrar_usuarios(u) if u else print("No existe")
+            elif op == "5":
+                print("Eliminado" if eliminar_usuario(int(input("Id: "))) else "No existe")
+            elif op == "0":
+                return
+        except Exception as e:
+            print("Error:", e)
+
+
 if __name__ == "__main__":
     create_db_and_tables()
     while True:
-        print("\n===== CRUD CON ORM (SQLModel) =====\n1 Mesas  2 Productos  0 Salir")
+        print("\n===== CRUD CON ORM (SQLModel) =====\n1 Mesas  2 Productos  3 Usuarios  0 Salir")
         op = input("Opción: ").strip()
         if op == "1":
             menu_mesas()
         elif op == "2":
             menu_productos()
+        elif op == "3":
+            menu_usuarios()
         elif op == "0":
             break

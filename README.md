@@ -26,7 +26,8 @@ Sistema backend para la gestión de restaurante con FastAPI, SQLModel y PostgreS
    ```powershell
    cp .env.example .env
    ```
-   O configura la variable de entorno:
+   La variable `DATABASE_URL` es obligatoria (no hay contraseña por defecto en el código).
+   También puedes configurarla como variable de entorno:
    ```powershell
    $env:DATABASE_URL = "postgresql+psycopg2://postgres:TU_PASSWORD@127.0.0.1:5432/polirestaurante"
    ```
@@ -53,10 +54,17 @@ pyt_web/
 ├── README.md            # Documentación del proyecto
 ├── main.py              # Punto de entrada FastAPI
 ├── DataBase.py          # Conexión y sesión de base de datos
+├── security.py          # Hash de contraseñas (compartido por API y scripts)
 ├── models/              # Modelos de SQLModel (User, Table, Product, etc.)
 ├── routers/             # Rutas por rol (admin, cocina, mesero)
 ├── static/              # Frontend web (HTML, CSS, JS)
-├── crud_driver.py       # Script CRUD con SQL puro
-├── crud_orm.py          # Script CRUD con ORM
+├── crud_driver.py       # Script de terminal (SQL puro): mesas, productos y usuarios
+├── crud_orm.py          # Script de terminal (ORM): mesas, productos y usuarios
 └── postman/             # Colecciones de pruebas API
 ```
+
+## 👥 Gestión de usuarios (HU-01)
+
+- **Web:** en `http://127.0.0.1:8000/` está la sección "Usuarios" (crear, listar, editar y eliminar). Al editar, la contraseña vacía conserva la actual.
+- **Terminal:** `python crud_orm.py` o `python crud_driver.py` → opción `3 Usuarios`.
+- **API:** `/admin/users` (ver Swagger en `/docs`).

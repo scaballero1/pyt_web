@@ -18,23 +18,21 @@ class TipoPedido(str, Enum):
     PARA_LLEVAR = "para_llevar"
 
 
+def utcnow() -> datetime:
+    return datetime.now(timezone.utc)
+
+
 class Order(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     mesa_id: Optional[int] = Field(default=None, foreign_key="table.id")
     mesero_id: int = Field(foreign_key="user.id")
     tipo_pedido: TipoPedido = TipoPedido.SALON
     estado: EstadoPedido = EstadoPedido.PENDIENTE
-    fecha_creacion: datetime = Field(default_factory=datetime.utcnow)
-    fecha_ultima_actualizacion: datetime = Field(
-        default_factory=datetime.utcnow
-    )
-
     fecha_creacion: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=utcnow,
         sa_type=DateTime(timezone=True),
     )
     fecha_ultima_actualizacion: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=utcnow,
         sa_type=DateTime(timezone=True),
     )
-    

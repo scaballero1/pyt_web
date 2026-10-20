@@ -119,8 +119,137 @@ async function crearMesa(e) {
     }
 }
 
+// ===================== GESTIÓN DE USUARIOS (HU-01) =====================
+let usuariosCache = [];
+
+// Escapa texto antes de insertarlo en el HTML (evita inyección de código)
+function esc(texto) {
+    return String(texto ?? "").replace(/[&<>"']/g, c => (
+        { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+    ));
+}
+
+const ROL_BADGE = { admin: "bg-danger", cocina: "bg-warning text-dark", mesero: "bg-success" };
+
+// Convierte el error de la API en un texto legible
+async function mensajeError(res) {
+    try {
+        const data = await res.json();
+        const d = data.detail ?? data;
+        if (Array.isArray(d)) return d.map(e => (e.loc ? e.loc.slice(1).join(".") + ": " : "") + e.msg).join("\n");
+        return typeof d === "string" ? d : JSON.stringify(d);
+    } catch {
+        return "Error " + res.status;
+    }
+}
+
+async function cargarUsuarios() {
+    const tbody = document.getElementById("tabla-usuarios");
+    try {
+        const res = await fetch(`${API_URL}/admin/users`);
+        if (!res.ok) throw new Error(await mensajeError(res));
+        usuariosCache = await res.json();
+
+        if (usuariosCache.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="text-muted text-center py-3">No hay usuarios registrados.</td></tr>`;
+            return;
+        }
+        tbody.innerHTML = usuariosCache.map(u => `
+            <tr>
+                <td>${u.id}</td>
+                <td>${esc(u.nombre)}</td>
+                <td>${esc(u.correo)}</td>
+                <td><span class="badge ${ROL_BADGE[u.rol] || "bg-secondary"}">${esc(u.rol)}</span></td>
+                <td class="text-end text-nowrap">
+                    <button class="btn btn-outline-primary btn-sm" onclick="editarUsuario(${u.id})">Editar</button>
+                    <button class="btn btn-outline-danger btn-sm" onclick="eliminarUsuario(${u.id})">Eliminar</button>
+                </td>
+            </tr>`).join("");
+    } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-danger text-center py-3">No se pudieron cargar los usuarios.</td></tr>`;
+        console.error("Error al obtener los usuarios:", err);
+    }
+}
+
+// Crea un usuario nuevo o actualiza el que se está editando
+async function guardarUsuario(e) {
+    e.preventDefault();
+    const id = document.getElementById("usuario-id").value;
+    const contrasena = document.getElementById("usuario-contrasena").value;
+    const payload = {
+        nombre: document.getElementById("usuario-nombre").value.trim(),
+        correo: document.getElementById("usuario-correo").value.trim(),
+        rol: document.getElementById("usuario-rol").value
+    };
+    if (contrasena) payload.contrasena = contrasena;   // al editar, vacío = no cambiar
+
+    try {
+        const res = await fetch(`${API_URL}/admin/users${id ? "/" + id : ""}`, {
+            method: id ? "PUT" : "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+            alert("Error al guardar el usuario: " + await mensajeError(res));
+            return;
+        }
+        cancelarEdicionUsuario();
+        cargarUsuarios();
+        alert(id ? "¡Usuario actualizado con éxito!" : "¡Usuario creado con éxito!");
+    } catch (err) {
+        alert("Error de conexión al guardar el usuario.");
+    }
+}
+
+// Pasa el formulario a modo edición con los datos del usuario
+function editarUsuario(id) {
+    const u = usuariosCache.find(x => x.id === id);
+    if (!u) return;
+    document.getElementById("usuario-id").value = u.id;
+    document.getElementById("usuario-nombre").value = u.nombre;
+    document.getElementById("usuario-correo").value = u.correo;
+    document.getElementById("usuario-rol").value = u.rol;
+    const pass = document.getElementById("usuario-contrasena");
+    pass.value = "";
+    pass.required = false;
+    pass.placeholder = "Dejar vacío para no cambiarla";
+    document.getElementById("usuario-titulo").textContent = "✏️ Editar Usuario #" + u.id;
+    document.getElementById("usuario-guardar").textContent = "Actualizar Usuario";
+    document.getElementById("usuario-cancelar").classList.remove("d-none");
+    document.getElementById("form-usuario").scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+// Vuelve el formulario a modo "crear"
+function cancelarEdicionUsuario() {
+    document.getElementById("form-usuario").reset();
+    document.getElementById("usuario-id").value = "";
+    const pass = document.getElementById("usuario-contrasena");
+    pass.required = true;
+    pass.placeholder = "Contraseña";
+    document.getElementById("usuario-titulo").textContent = "👥 Agregar Usuario";
+    document.getElementById("usuario-guardar").textContent = "Guardar Usuario";
+    document.getElementById("usuario-cancelar").classList.add("d-none");
+}
+
+async function eliminarUsuario(id) {
+    const u = usuariosCache.find(x => x.id === id);
+    if (!confirm(`¿Eliminar al usuario "${u ? u.nombre : id}"? Esta acción no se puede deshacer.`)) return;
+    try {
+        const res = await fetch(`${API_URL}/admin/users/${id}`, { method: "DELETE" });
+        if (!res.ok) {
+            alert("No se pudo eliminar: " + await mensajeError(res));
+        } else if (document.getElementById("usuario-id").value === String(id)) {
+            cancelarEdicionUsuario();
+        }
+        cargarUsuarios();
+    } catch (err) {
+        alert("Error de conexión al eliminar el usuario.");
+    }
+}
+
 // Cargar datos al abrir la página
 window.onload = () => {
     cargarMenu();
     cargarMesas();
+    cargarUsuarios();
 };
